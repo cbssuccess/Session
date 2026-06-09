@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCC — Coaching Session Lab</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
+
+  :root {
+    --navy: #0f0f1a;
+    --navy-mid: #1a1a2e;
+    --navy-light: #252540;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --cream: #f5f0e8;
+    --cream-dark: #ede6d6;
+    --text: #e8e4dc;
+    --text-muted: #9b96a0;
+    --client: #7eb8c9;
+    --coach: #c9a84c;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--navy);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    line-height: 1.7;
+  }
+
+  /* PIN SCREEN */
+  #pin-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 32px;
+    padding: 24px;
+    background: radial-gradient(ellipse at 50% 0%, #1a1a3a 0%, var(--navy) 70%);
+  }
+
+  .pin-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  .pin-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 6vw, 48px);
+    font-weight: 600;
+    color: var(--cream);
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .pin-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    text-align: center;
+    max-width: 320px;
+  }
+
+  .pin-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .pin-input {
+    width: 100%;
+    background: var(--navy-light);
+    border: 1px solid #333355;
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    text-align: center;
+    letter-spacing: 0.3em;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .pin-input:focus { border-color: var(--gold); }
+
+  .pin-error {
+    color: #e07070;
+    font-size: 13px;
+    display: none;
+  }
+
+  /* BUTTONS */
+  .btn {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--navy);
+    border: none;
+    border-radius: var(--radius);
+    padding: 14px 32px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    width: 100%;
+  }
+
+  .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid #333355;
+    color: var(--text-muted);
+    border-radius: var(--radius);
+    padding: 10px 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* MAIN APP */
+  #app { display: none; min-height: 100vh; }
+
+  /* HEADER */
+  .app-header {
+    background: var(--navy-mid);
+    border-bottom: 1px solid #222240;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .app-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  .app-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--cream);
+  }
+
+  /* STAGE INDICATOR */
+  .stages {
+    display: flex;
+    gap: 8px;
+    padding: 20px 24px;
+    background: var(--navy-mid);
+    border-bottom: 1px solid #1a1a30;
+  }
+
+  .stage-pill {
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    background: var(--navy-light);
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: all 0.3s;
+  }
+
+  .stage-pill.active {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--navy);
+    border-color: transparent;
+  }
+
+  .stage-pill.done {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: transparent;
+  }
+
+  /* INTRO SCREEN */
+  #intro-screen {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 60px 24px;
+    display: none;
+  }
+
+  .intro-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .intro-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 600;
+    color: var(--cream);
+    line-height: 1.15;
+    margin-bottom: 24px;
+  }
+
+  .intro-body {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+
+  .intro-card {
+    background: var(--navy-light);
+    border: 1px solid #2a2a4a;
+    border-radius: var(--radius);
+    padding: 24px;
+    margin: 32px 0;
+  }
+
+  .intro-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  .intro-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .intro-card li {
+    font-size: 14px;
+    color: var(--text-muted);
+    padding-left: 20px;
+    position: relative;
+  }
+
+  .intro-card li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+  }
+
+  /* CHAT SCREEN */
+  #chat-screen {
+    display: none;
+    flex-direction: column;
+    height: calc(100vh - 120px);
+  }
+
+  .chat-context-bar {
+    background: var(--navy-light);
+    border-bottom: 1px solid #222240;
+    padding: 12px 24px;
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .context-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: inline-block;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 760px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .message {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .message-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .message.client .message-label { color: var(--client); }
+  .message.coach .message-label { color: var(--coach); }
+  .message.system .message-label { color: var(--text-muted); }
+
+  .message-bubble {
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .message.client .message-bubble {
+    background: #1a2a35;
+    border: 1px solid #1e3545;
+    color: var(--text);
+    border-left: 3px solid var(--client);
+  }
+
+  .message.coach .message-bubble {
+    background: #2a2010;
+    border: 1px solid #3a3020;
+    color: var(--text);
+    border-left: 3px solid var(--gold);
+  }
+
+  .message.system .message-bubble {
+    background: var(--navy-light);
+    border: 1px solid #2a2a4a;
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .typing-indicator {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 16px 20px;
+  }
+
+  .typing-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--client);
+    animation: bounce 1.2s infinite;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; background: var(--gold); }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-8px); opacity: 1; }
+  }
+
+  /* CHAT INPUT */
+  .chat-input-area {
+    border-top: 1px solid #1a1a30;
+    padding: 16px 24px;
+    background: var(--navy-mid);
+  }
+
+  .chat-input-wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+  }
+
+  .chat-textarea {
+    flex: 1;
+    background: var(--navy-light);
+    border: 1px solid #333355;
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    resize: none;
+    outline: none;
+    min-height: 52px;
+    max-height: 160px;
+    line-height: 1.5;
+    transition: border-color 0.2s;
+  }
+
+  .chat-textarea:focus { border-color: var(--gold); }
+  .chat-textarea::placeholder { color: var(--text-muted); }
+
+  .send-btn {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border: none;
+    border-radius: var(--radius);
+    width: 52px;
+    height: 52px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+    color: var(--navy);
+  }
+
+  .send-btn:hover { opacity: 0.85; }
+  .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .session-controls {
+    max-width: 760px;
+    margin: 8px auto 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  /* ANALYSIS SCREEN */
+  #analysis-screen {
+    display: none;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  .analysis-header {
+    margin-bottom: 40px;
+    text-align: center;
+  }
+
+  .analysis-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .analysis-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 5vw, 44px);
+    color: var(--cream);
+    line-height: 1.2;
+  }
+
+  .analysis-section {
+    margin-bottom: 40px;
+  }
+
+  .analysis-section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    color: var(--gold);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #2a2a4a;
+  }
+
+  .analysis-content {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+
+  .analysis-loading {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .analysis-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+
+  /* API KEY NOTICE */
+  .api-notice {
+    background: #1a1a10;
+    border: 1px solid #3a3a20;
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    font-size: 13px;
+    color: var(--gold);
+    margin-bottom: 24px;
+    display: none;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #333355; border-radius: 3px; }
+
+  /* DIVIDER */
+  .gold-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 40px 0;
+    opacity: 0.4;
+  }
+
+  .turn-count {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- PIN SCREEN -->
+<div id="pin-screen">
+  <div class="pin-logo">Shining Clarity Coaching</div>
+  <div class="pin-title">Coaching Session<br>Analysis Lab</div>
+  <div class="pin-subtitle">For Scott — enter your access PIN to begin</div>
+  <div class="pin-box">
+    <input type="password" class="pin-input" id="pin-input" placeholder="• • • • •" maxlength="10" autocomplete="off">
+    <div class="pin-error" id="pin-error">Incorrect PIN. Try again.</div>
+    <button class="btn" onclick="checkPin()">Enter</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="app-header">
+    <div class="app-logo">Shining Clarity Coaching</div>
+    <div class="app-title">Coaching Session Lab</div>
+    <div style="width:120px;text-align:right">
+      <span id="header-stage" style="font-size:12px;color:var(--text-muted)">Session</span>
+    </div>
+  </div>
+
+  <div class="stages">
+    <div class="stage-pill active" id="stage-1">1. Session</div>
+    <div class="stage-pill" id="stage-2">2. Follow-up</div>
+    <div class="stage-pill" id="stage-3">3. Analysis</div>
+  </div>
+
+  <!-- INTRO -->
+  <div id="intro-screen">
+    <div class="intro-eyebrow">Welcome, Scott</div>
+    <div class="intro-title">Your Mock Coaching Session</div>
+    <div class="intro-body">
+      This tool walks you through a simulated first coaching session with an SCC ideal client — then analyzes your coaching style against the same parameters used to analyze Cait's session.
+    </div>
+    <div class="intro-body">
+      The goal is to surface your natural methodology so you and Cait can compare frameworks and build the combined SCC Breakthrough Method together.
+    </div>
+
+    <div class="intro-card">
+      <h3>Your Client Today</h3>
+      <ul>
+        <li>Self-aware, growth-oriented, past survival mode</li>
+        <li>Has done therapy, read the books, knows their patterns</li>
+        <li>Still can't break through — frustrated with their own ceiling</li>
+        <li>Asking "how do I actually change" not "help me cope"</li>
+        <li>Will give real resistance — not a softball client</li>
+      </ul>
+    </div>
+
+    <div class="intro-card">
+      <h3>How It Works</h3>
+      <ul>
+        <li>Claude plays the client — you coach naturally</li>
+        <li>Coach for as long as feels right (aim for 8–15 exchanges)</li>
+        <li>When you're ready, click "End Session & Analyze"</li>
+        <li>Claude will analyze your coaching style, instincts, and methodology</li>
+        <li>You can download your full analysis as a document</li>
+      </ul>
+    </div>
+
+    <div class="api-notice" id="api-notice">
+      ⚠️ API key not configured. Add your Anthropic API key to the ANTHROPIC_API_KEY variable in the script to enable AI responses.
+    </div>
+
+    <button class="btn" onclick="startSession()" style="margin-top:8px">Begin Session</button>
+  </div>
+
+  <!-- CHAT -->
+  <div id="chat-screen">
+    <div class="chat-context-bar">
+      <span class="context-dot"></span>
+      SCC Ideal Client — Growth mode, self-aware, pattern-stuck
+      <span id="turn-counter" style="margin-left:auto">0 exchanges</span>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input-area">
+      <div class="chat-input-wrap">
+        <textarea class="chat-textarea" id="coach-input" placeholder="Coach here..." rows="2"
+          onkeydown="handleKey(event)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="session-controls">
+        <button class="btn-ghost" onclick="endSession()" id="end-btn">End Session &amp; Analyze</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOLLOW-UP CONVERSATION -->
+  <div id="followup-screen" style="display:none;flex-direction:column;height:calc(100vh - 120px)">
+    <div class="chat-context-bar">
+      <span class="context-dot" style="background:var(--gold)"></span>
+      Follow-up conversation — Claude is asking clarifying questions before analysis
+      <span id="followup-counter" style="margin-left:auto"></span>
+    </div>
+    <div class="chat-messages" id="followup-messages"></div>
+    <div class="chat-input-area">
+      <div class="chat-input-wrap">
+        <textarea class="chat-textarea" id="followup-input" placeholder="Answer here..." rows="2"
+          onkeydown="handleFollowupKey(event)"></textarea>
+        <button class="send-btn" id="followup-send-btn" onclick="sendFollowup()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="session-controls">
+        <button class="btn-ghost" id="run-analysis-btn" onclick="runAnalysis()" style="display:none">Run Full Analysis</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS -->
+  <div id="analysis-screen" style="display:none">
+    <div class="analysis-header">
+      <div class="analysis-eyebrow">Session Complete</div>
+      <div class="analysis-title">Your Coaching Style Analysis</div>
+    </div>
+    <div id="analysis-content">
+      <div class="analysis-loading">Running full analysis...<br><br>
+        <div style="display:flex;justify-content:center;gap:8px;margin-top:16px">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+    </div>
+    <div class="analysis-actions" id="analysis-actions" style="display:none">
+      <button class="btn" onclick="window.print()" style="flex:1;min-width:200px">Print / Save as PDF</button>
+      <button class="btn-ghost" onclick="resetApp()">Start New Session</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURATION — Add API key when ready
+// ============================================================
+const ANTHROPIC_API_KEY = "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";
+const PIN = "wolf";
+
+// ============================================================
+// STATE
+// ============================================================
+let conversationHistory = [];
+let turnCount = 0;
+let sessionEnded = false;
+let followupHistory = [];
+let followupDone = false;
+let sessionTranscript = '';
+
+// ============================================================
+// SCC SYSTEM PROMPTS
+// ============================================================
+const CLIENT_SYSTEM_PROMPT = `You are playing the role of an SCC ideal coaching client for a mock session with Scott, co-founder of Shining Clarity Coaching.
+
+ABOUT SHINING CLARITY COACHING (SCC):
+- Founded by Cait and Scott. Website: shiningclaritycoaching.com
+- Tagline: "Stop the cycle. For the person who's done the work and still can't make it stop."
+- Scott specializes in behavior patterns and root belief recognition
+- Cait specializes in cognitive distortions, neuroplasticity, and worthiness work
+- They use a simultaneous dual-lens approach — triangulating root beliefs from two angles at once
+- Ideal client: growth-minded, self-aware, past crisis mode, frustrated with their own ceiling
+- Core belief: worthiness is inherent, not earned
+
+YOUR CHARACTER:
+You are a self-aware adult in your late 30s. You've been in therapy on and off for years. You've read the books. You know your patterns intellectually. You can watch yourself doing the thing in real time — and still can't stop. You're frustrated, not broken. You're not in crisis — you're in growth mode hitting a ceiling.
+
+Your presenting issue: You keep repeating a pattern in your relationships — you pursue hard when someone pulls away, even when you know it's pushing them further. You can narrate exactly what you're doing as you're doing it. Nothing has changed it.
+
+UNDERNEATH (don't reveal this too fast — let Scott draw it out):
+- Deep fear of abandonment rooted in early experiences
+- Core belief: "I am only loved when I'm needed / when I perform"
+- The pursuit pattern is a protective mechanism that made sense once
+- You don't feel worthy of love that isn't conditional on your effort
+
+HOW TO PLAY THIS:
+- Start with the surface presenting problem
+- Give real resistance — don't make it easy
+- Ask good questions that push back on generic advice
+- When Scott says something that genuinely lands, let it land — show the shift
+- Gradually allow deeper access as trust builds
+- React authentically to his specific approach and language
+- Give shorter responses early, open up more as the session progresses
+- Use language like "always", "nobody ever", "I just can't", "I know but..."
+
+Stay in character throughout. This is a real simulation to help Scott understand his natural coaching methodology.`;
+
+const ANALYSIS_SYSTEM_PROMPT = `You are analyzing Scott's coaching methodology and style based on his mock session with an SCC ideal client.
+
+ABOUT SHINING CLARITY COACHING (SCC):
+- Founded by Cait (cognitive distortions, neuroplasticity, worthiness work) and Scott (behavior patterns, root belief recognition)
+- Website: shiningclaritycoaching.com
+- Ideal client: growth-minded, self-aware, past crisis mode, frustrated with their ceiling
+- Core philosophy: address the SOURCE (core beliefs/worthiness wounds) not just SYMPTOMS (behaviors/coping tools)
+- The Breakthrough Method: Listen & Map → Surface Work → Pull the Thread → The Breakthrough
+
+CAIT'S FRAMEWORK FOR COMPARISON:
+- Coaches from inside out — uses symptoms as map to source
+- Names the wound without shame
+- Uses lived experience strategically — not as crutch
+- Creates powerful mechanistic analogies (overflowing bathtub, path through woods)
+- Distinguishes symptoms vs source without dismissing either
+- Explicitly names safety as prerequisite for deep work
+- Modality-agnostic — right tool, right person, right moment
+
+YOUR ANALYSIS TASK:
+Analyze Scott's coaching session across these exact parameters:
+
+1. WHAT HIS COACHING STYLE ACTUALLY IS — the core approach, what he leads with
+2. WHAT HE DOES WELL — specific, named strengths with examples from the session
+3. AREAS WORTH NOTICING — not weaknesses, but patterns worth being conscious of
+4. HOW HE HANDLES THE WOUND — does he go to the root? How? When?
+5. TOOLS VS SOURCE — does he distinguish between symptom management and root work?
+6. SAFETY AND TRUST — how does he build it? Does he name it?
+7. LANGUAGE AND ANALOGIES — what specific language landed? What didn't?
+8. PACE — how fast does he move toward depth?
+9. THE DUAL LENS OPPORTUNITY — where does his behavioral/pattern approach complement Cait's cognitive/worthiness approach?
+10. WHAT HIS FRAMEWORK APPEARS TO BE — name the emerging structure of how he works
+
+Be specific, reference actual moments from the session, be honest but constructive. Frame everything through the SCC lens. The goal is to help Scott and Cait build their combined methodology.`;
+
+const FOLLOWUP_SYSTEM_PROMPT = `You are helping analyze Scott's coaching methodology for Shining Clarity Coaching (SCC).
+
+You have just reviewed a transcript of Scott's mock coaching session. Your job now is to have a natural follow-up conversation with Scott — asking him clarifying questions about his coaching approach so your final analysis is accurate and specific rather than based on assumptions.
+
+ABOUT SCC:
+- Founded by Cait (cognitive distortions, neuroplasticity, worthiness work) and Scott (behavior patterns, root belief recognition)
+- Dual-lens approach — triangulating root beliefs from two angles simultaneously
+- Ideal client: growth-minded, self-aware, past crisis mode, frustrated with their ceiling
+- Core philosophy: address SOURCE (core beliefs/worthiness wounds) not just SYMPTOMS
+
+HOW TO CONDUCT THIS CONVERSATION:
+- Review the transcript carefully first
+- Ask ONE question at a time — natural, conversational, not a form
+- Ask about things that were ambiguous, unclear, or not shown in the session
+- Ask follow-up questions based on his actual answers — let it flow like a real conversation
+- Don't ask things the transcript already answered clearly
+- Ask about: where he starts with clients, how he identifies core beliefs, what he was thinking in specific moments, his process for building trust, how he decides when to go deeper, what success looks like to him
+- When you feel you have enough to write a thorough analysis — say something like "I think I have what I need — ready to run your full analysis whenever you are." and set a flag in your response by ending it with [READY_FOR_ANALYSIS]
+- Aim for 4-8 exchanges before wrapping up — don't drag it out but don't rush either
+
+Start by briefly acknowledging the session and asking your first most important question based on what you observed.`;
+
+// ============================================================
+// PIN CHECK
+// ============================================================
+function checkPin() {
+  const input = document.getElementById('pin-input').value.toLowerCase().trim();
+  const error = document.getElementById('pin-error');
+  if (input === PIN) {
+    document.getElementById('pin-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('intro-screen').style.display = 'block';
+    if (ANTHROPIC_API_KEY === "YOUR_API_KEY_HERE") {
+      document.getElementById('api-notice').style.display = 'block';
+    }
+  } else {
+    error.style.display = 'block';
+    document.getElementById('pin-input').value = '';
+  }
+}
+
+document.getElementById('pin-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkPin();
+});
+
+// ============================================================
+// SESSION START
+// ============================================================
+function startSession() {
+  document.getElementById('intro-screen').style.display = 'none';
+  document.getElementById('chat-screen').style.display = 'flex';
+  addSystemMessage("Session started. The client will speak first. Coach naturally.");
+  getClientOpening();
+}
+
+async function getClientOpening() {
+  const opening = await callClaude(CLIENT_SYSTEM_PROMPT, [
+    { role: "user", content: "Begin the session. Give your opening as the client — what brings you here today. Be real, a little guarded, but willing to try." }
+  ]);
+  addMessage('client', 'CLIENT', opening);
+  conversationHistory.push({ role: "assistant", content: opening });
+}
+
+// ============================================================
+// MESSAGING
+// ============================================================
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+async function sendMessage() {
+  const input = document.getElementById('coach-input');
+  const text = input.value.trim();
+  if (!text || sessionEnded) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+
+  addMessage('coach', 'SCOTT', text);
+  conversationHistory.push({ role: "user", content: text });
+
+  turnCount++;
+  document.getElementById('turn-counter').textContent = `${turnCount} exchange${turnCount !== 1 ? 's' : ''}`;
+
+  document.getElementById('send-btn').disabled = true;
+  const typing = addTyping();
+
+  const clientMessages = [
+    ...conversationHistory,
+  ];
+
+  const response = await callClaude(CLIENT_SYSTEM_PROMPT, clientMessages);
+
+  typing.remove();
+  document.getElementById('send-btn').disabled = false;
+
+  addMessage('client', 'CLIENT', response);
+  conversationHistory.push({ role: "assistant", content: response });
+
+  if (turnCount >= 6) {
+    document.getElementById('end-btn').style.borderColor = 'var(--gold)';
+    document.getElementById('end-btn').style.color = 'var(--gold)';
+  }
+}
+
+// ============================================================
+// END SESSION → START FOLLOW-UP
+// ============================================================
+async function endSession() {
+  if (turnCount < 3) {
+    addSystemMessage("Keep coaching a bit longer before ending — aim for at least 5-6 exchanges.");
+    return;
+  }
+
+  sessionEnded = true;
+  sessionTranscript = conversationHistory
+    .map(m => `${m.role === 'user' ? 'SCOTT' : 'CLIENT'}: ${m.content}`)
+    .join('\n\n');
+
+  // Switch to follow-up screen
+  document.getElementById('chat-screen').style.display = 'none';
+  document.getElementById('followup-screen').style.display = 'flex';
+  document.getElementById('stage-1').classList.remove('active');
+  document.getElementById('stage-1').classList.add('done');
+  document.getElementById('stage-2').classList.add('active');
+
+  // Get first follow-up question
+  const firstQuestion = await callClaude(FOLLOWUP_SYSTEM_PROMPT, [
+    { role: "user", content: `Here is the session transcript:\n\n${sessionTranscript}\n\nPlease review it and ask your first clarifying question.` }
+  ], 600);
+
+  addFollowupMessage('claude', 'CLAUDE', firstQuestion);
+  followupHistory.push({ role: "assistant", content: firstQuestion });
+
+  if (firstQuestion.includes('[READY_FOR_ANALYSIS]')) {
+    showReadyButton();
+  }
+}
+
+// ============================================================
+// FOLLOW-UP CONVERSATION
+// ============================================================
+function handleFollowupKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendFollowup();
+  }
+}
+
+async function sendFollowup() {
+  const input = document.getElementById('followup-input');
+  const text = input.value.trim();
+  if (!text || followupDone) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+
+  addFollowupMessage('scott', 'SCOTT', text);
+  followupHistory.push({ role: "user", content: text });
+
+  document.getElementById('followup-send-btn').disabled = true;
+  const typing = addFollowupTyping();
+
+  // Build messages for follow-up — include transcript context in first message
+  const messages = [
+    { role: "user", content: `Here is the session transcript:\n\n${sessionTranscript}\n\nPlease review it and ask your first clarifying question.` },
+    ...followupHistory.slice(0, -1),
+    { role: "user", content: text }
+  ];
+
+  const response = await callClaude(FOLLOWUP_SYSTEM_PROMPT, messages, 600);
+
+  typing.remove();
+  document.getElementById('followup-send-btn').disabled = false;
+
+  const cleanResponse = response.replace('[READY_FOR_ANALYSIS]', '').trim();
+  addFollowupMessage('claude', 'CLAUDE', cleanResponse);
+  followupHistory.push({ role: "assistant", content: response });
+
+  if (response.includes('[READY_FOR_ANALYSIS]')) {
+    showReadyButton();
+  }
+}
+
+function showReadyButton() {
+  followupDone = true;
+  document.getElementById('followup-send-btn').disabled = true;
+  document.getElementById('followup-input').placeholder = 'Follow-up complete — click Run Full Analysis';
+  document.getElementById('run-analysis-btn').style.display = 'block';
+  document.getElementById('run-analysis-btn').style.borderColor = 'var(--gold)';
+  document.getElementById('run-analysis-btn').style.color = 'var(--gold)';
+}
+
+// ============================================================
+// FINAL ANALYSIS
+// ============================================================
+async function runAnalysis() {
+  document.getElementById('followup-screen').style.display = 'none';
+  document.getElementById('analysis-screen').style.display = 'block';
+  document.getElementById('stage-2').classList.remove('active');
+  document.getElementById('stage-2').classList.add('done');
+  document.getElementById('stage-3').classList.add('active');
+
+  // Build follow-up summary for analysis
+  const followupSummary = followupHistory
+    .map(m => `${m.role === 'user' ? 'SCOTT' : 'CLAUDE'}: ${m.content.replace('[READY_FOR_ANALYSIS]', '')}`)
+    .join('\n\n');
+
+  const analysisMessages = [
+    { role: "user", content: `Here is the complete coaching session transcript:\n\n${sessionTranscript}\n\n---\n\nAnd here is the follow-up conversation where Scott clarified his approach:\n\n${followupSummary}\n\n---\n\nNow please provide the full coaching style analysis across all parameters. Be specific, reference actual moments from both the session and the follow-up conversation. Be honest and constructive.` }
+  ];
+
+  const analysis = await callClaude(ANALYSIS_SYSTEM_PROMPT, analysisMessages, 2500);
+  renderAnalysis(analysis);
+}
+
+function renderAnalysis(text) {
+  const container = document.getElementById('analysis-content');
+
+  let html = '';
+  const paragraphs = text.split('\n\n');
+
+  paragraphs.forEach(para => {
+    para = para.trim();
+    if (!para) return;
+
+    if (para.match(/^#{1,2} /)) {
+      const level = para.match(/^#{1,2}/)[0].length;
+      const content = para.replace(/^#{1,2} /, '');
+      if (level === 1) {
+        html += `<div class="analysis-section"><div class="analysis-section-title">${content}</div>`;
+      } else {
+        html += `<div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--cream);margin:20px 0 8px;font-weight:600">${content}</div>`;
+      }
+    } else if (para.match(/^\*\*[^*]+\*\*/)) {
+      const content = para.replace(/\*\*([^*]+)\*\*/g, '<strong style="color:var(--cream)">$1</strong>').replace(/\n/g, '<br>');
+      html += `<div class="analysis-content" style="margin-bottom:16px">${content}</div>`;
+    } else {
+      const content = para.replace(/\*\*([^*]+)\*\*/g, '<strong style="color:var(--cream)">$1</strong>').replace(/\n/g, '<br>');
+      html += `<div class="analysis-content" style="margin-bottom:16px">${content}</div>`;
+    }
+  });
+
+  container.innerHTML = `<div style="padding-bottom:40px">${html}</div>`;
+  document.getElementById('analysis-actions').style.display = 'flex';
+}
+
+// ============================================================
+// API CALL
+// ============================================================
+async function callClaude(systemPrompt, messages, maxTokens = 1000) {
+  if (ANTHROPIC_API_KEY === "YOUR_API_KEY_HERE") {
+    return "[API key not configured. Add your Anthropic API key to the ANTHROPIC_API_KEY variable at the top of the script.]";
+  }
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: maxTokens,
+        system: systemPrompt,
+        messages: messages
+      })
+    });
+
+    const data = await response.json();
+    
+    if (data.error) {
+        console.error("API Error:", data.error);
+        return "Error from API: " + data.error.message;
+    }
+    
+    if (data.content && data.content[0]) {
+      return data.content[0].text;
+    }
+    return "Something went wrong. Please try again.";
+  } catch (err) {
+    console.error("Fetch Error:", err);
+    return "Connection error. Please check your API key and try again.";
+  }
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function addMessage(type, label, text) {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `message ${type}`;
+  div.innerHTML = `
+    <div class="message-label">${label}</div>
+    <div class="message-bubble">${text.replace(/\n/g, '<br>')}</div>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+
+function addSystemMessage(text) {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'message system';
+  div.innerHTML = `<div class="message-bubble">${text}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function addTyping() {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'message client';
+  div.innerHTML = `
+    <div class="message-label">CLIENT</div>
+    <div class="message-bubble">
+      <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+
+function addFollowupMessage(type, label, text) {
+  const container = document.getElementById('followup-messages');
+  const div = document.createElement('div');
+  div.className = `message ${type === 'claude' ? 'system' : 'coach'}`;
+  const cleanText = text.replace('[READY_FOR_ANALYSIS]', '').trim();
+  div.innerHTML = `
+    <div class="message-label" style="color:${type === 'claude' ? 'var(--gold)' : 'var(--coach)'}">${label}</div>
+    <div class="message-bubble" style="${type === 'claude' ? 'background:var(--navy-light);border-color:#2a2a4a;font-style:normal;text-align:left;color:var(--text)' : ''}">${cleanText.replace(/\n/g, '<br>')}</div>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+
+function addFollowupTyping() {
+  const container = document.getElementById('followup-messages');
+  const div = document.createElement('div');
+  div.className = 'message system';
+  div.innerHTML = `
+    <div class="message-label" style="color:var(--gold)">CLAUDE</div>
+    <div class="message-bubble" style="background:var(--navy-light);border-color:#2a2a4a;font-style:normal;text-align:left">
+      <div class="typing-indicator">
+        <div class="typing-dot" style="background:var(--gold)"></div>
+        <div class="typing-dot" style="background:var(--gold)"></div>
+        <div class="typing-dot" style="background:var(--gold)"></div>
+      </div>
+    </div>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+
+function resetApp() {
+  conversationHistory = [];
+  turnCount = 0;
+  sessionEnded = false;
+  followupHistory = [];
+  followupDone = false;
+  sessionTranscript = '';
+  document.getElementById('analysis-screen').style.display = 'none';
+  document.getElementById('followup-screen').style.display = 'none';
+  document.getElementById('chat-messages').innerHTML = '';
+  document.getElementById('followup-messages').innerHTML = '';
+  document.getElementById('followup-input').placeholder = 'Answer here...';
+  document.getElementById('followup-send-btn').disabled = false;
+  document.getElementById('run-analysis-btn').style.display = 'none';
+  document.getElementById('stage-1').classList.add('active');
+  document.getElementById('stage-1').classList.remove('done');
+  document.getElementById('stage-2').classList.remove('active');
+  document.getElementById('stage-2').classList.remove('done');
+  document.getElementById('stage-3').classList.remove('active');
+  document.getElementById('intro-screen').style.display = 'block';
+}
+
+// Auto-resize textarea
+document.getElementById('coach-input').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 160) + 'px';
+});
+</script>
+</body>
+</html>
