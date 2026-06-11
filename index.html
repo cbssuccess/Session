@@ -1389,14 +1389,15 @@ async function runAnalysis() {
     { role: "user", content: `Here is the complete coaching session transcript:\n\n${sessionTranscript}\n\n---\n\nAnd here is the follow-up conversation where Scott clarified his approach:\n\n${followupSummary}\n\n---\n\nNow please provide the full coaching style analysis across all parameters. Be specific, reference actual moments from both the session and the follow-up conversation. Be honest and constructive.` }
   ];
 
-  const clientProfile = `CLIENT PROFILE FOR THIS SESSION:
+  const clientProfile = `CLIENT CONTEXT FOR THIS SESSION:
 - Name: ${selectedClient.name}
 - Presenting issue: ${selectedClient.issue}
-- Designed temperament: ${selectedClient.temperament}
+- Temperament: ${selectedClient.temperament}
 - Cooperation level: ${selectedClient.cooperation}/5
-- What they were built to reveal slowly: ${selectedClient.bullets.join('; ')}
 
-Use this profile to contextualize Scott's coaching — e.g. if the client was designed to be resistant, note how Scott handled that specifically. Compare what the client was hiding vs. what Scott actually surfaced.
+Use this to calibrate the difficulty Scott was working with — a resistant, guarded client requires different coaching instincts than a warm, eager one. Factor that into how you read his pacing, his trust-building, and his decisions about when to push and when to hold back.
+
+Do NOT treat the hidden wound as a "right answer" Scott should have found. This is a first session. Not surfacing the root in one conversation isn't a failure — it may be appropriate pacing. Instead, note what Scott sensed, what he moved toward, and how his natural approach fits (or creates friction with) this specific client type.
 
 `;
   const analysis = await callClaude(clientProfile + ANALYSIS_SYSTEM_PROMPT, analysisMessages, 2500);
