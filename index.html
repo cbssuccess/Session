@@ -1389,7 +1389,17 @@ async function runAnalysis() {
     { role: "user", content: `Here is the complete coaching session transcript:\n\n${sessionTranscript}\n\n---\n\nAnd here is the follow-up conversation where Scott clarified his approach:\n\n${followupSummary}\n\n---\n\nNow please provide the full coaching style analysis across all parameters. Be specific, reference actual moments from both the session and the follow-up conversation. Be honest and constructive.` }
   ];
 
-  const analysis = await callClaude(ANALYSIS_SYSTEM_PROMPT, analysisMessages, 2500);
+  const clientProfile = `CLIENT PROFILE FOR THIS SESSION:
+- Name: ${selectedClient.name}
+- Presenting issue: ${selectedClient.issue}
+- Designed temperament: ${selectedClient.temperament}
+- Cooperation level: ${selectedClient.cooperation}/5
+- What they were built to reveal slowly: ${selectedClient.bullets.join('; ')}
+
+Use this profile to contextualize Scott's coaching — e.g. if the client was designed to be resistant, note how Scott handled that specifically. Compare what the client was hiding vs. what Scott actually surfaced.
+
+`;
+  const analysis = await callClaude(clientProfile + ANALYSIS_SYSTEM_PROMPT, analysisMessages, 2500);
   renderAnalysis(analysis);
 }
 
